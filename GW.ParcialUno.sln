@@ -3,18 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{932ACA9E-3D74-4FE8-AB80-28521E6393F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{932ACA9E-3D74-4FE8-AB80-28521E6393F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{33E87C3D-FA2B-4600-84BB-27F0C898ADFD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{33E87C3D-FA2B-4600-84BB-27F0C898ADFD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D7782CEC-FDD0-4B24-B241-0A51C2B54B12}"
-	ProjectSection(SolutionItems) = preProject
-		docker-compose.yml = docker-compose.yml
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{EB705D91-260F-4B0F-B65E-3F372FE8B403}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{EB705D91-260F-4B0F-B65E-3F372FE8B403}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{E2F3998C-57C7-4C88-9AA8-1018C4C656B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{E2F3998C-57C7-4C88-9AA8-1018C4C656B3}"
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{85D4019A-0697-4863-9F8A-DBA055BE3A5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +35,10 @@ Global
 		{E2F3998C-57C7-4C88-9AA8-1018C4C656B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2F3998C-57C7-4C88-9AA8-1018C4C656B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2F3998C-57C7-4C88-9AA8-1018C4C656B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85D4019A-0697-4863-9F8A-DBA055BE3A5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85D4019A-0697-4863-9F8A-DBA055BE3A5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85D4019A-0697-4863-9F8A-DBA055BE3A5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85D4019A-0697-4863-9F8A-DBA055BE3A5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
