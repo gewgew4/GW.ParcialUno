@@ -2,7 +2,7 @@
 
 public interface IUnitOfWork : IDisposable
 {
-    IDocumentRepo Documents { get; }
-    IPrintJobRepo PrintJobs { get; }
+    IDocumentRepo DocumentRepo { get; }
+    IPrintJobRepo PrintJobRepo { get; }
     Task<int> SaveAsync();
 }
