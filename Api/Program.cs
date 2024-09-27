@@ -1,6 +1,8 @@
+using Api.Middlewares;
 using Application;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace Api;
 
@@ -23,6 +25,15 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddHttpContextAccessor();
 
+
+        // Serilog
+        var logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(builder.Configuration)
+            .Enrich.FromLogContext()
+            .CreateLogger();
+        builder.Logging.AddSerilog(logger);
+
+        // Add configurations
         builder.Services.InfrastructureConfigureServices(builder.Configuration);
         builder.Services.ApplicationConfigureServices(builder.Configuration);
 
@@ -39,14 +50,15 @@ public class Program
             }
             catch (Exception ex)
             {
-                var logger = services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(ex, "An error occurred while migrating the database.");
+                var loggerDb = services.GetRequiredService<ILogger<Program>>();
+                loggerDb.LogError(ex, "An error occurred while migrating the database.");
             }
         }
 
         // Configure the HTTP request pipeline.
         //if (app.Environment.IsDevelopment())
         //{
+        app.UseMiddleware<ExceptionHandlerMiddleware>(app.Environment.IsDevelopment());
         app.UseSwagger();
         app.UseSwaggerUI();
         //}
@@ -54,7 +66,6 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
-
 
         app.MapControllers();
 

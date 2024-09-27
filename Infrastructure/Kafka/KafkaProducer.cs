@@ -12,7 +12,7 @@ public class KafkaProducer : IKafkaProducer, IDisposable
     {
         var config = new ProducerConfig
         {
-            BootstrapServers = kafkaSettings.Value.BootstrapServers
+            BootstrapServers = Environment.GetEnvironmentVariable("BootstrapServers") //kafkaSettings.Value.BootstrapServers
         };
 
         _producer = new ProducerBuilder<Null, string>(config).Build();
@@ -20,7 +20,25 @@ public class KafkaProducer : IKafkaProducer, IDisposable
 
     public async Task ProduceAsync(string topic, string message)
     {
-        await _producer.ProduceAsync(topic, new Message<Null, string> { Value = message });
+        // TODO: sacar
+        try
+        {
+            var result = await _producer.ProduceAsync(topic, new Message<Null, string> { Value = message });
+            //_logger.($"Delivered '{result.Value}' to '{result.TopicPartitionOffset}'");
+            if (true)
+            {
+
+            }
+        }
+        catch (ProduceException<Null, string> e)
+        {
+            Console.WriteLine($"Delivery failed: {e.Error.Reason}");
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
     }
 
     public void Dispose()

@@ -13,7 +13,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=GWParcialUno;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
-      - KafkaSettings__BootstrapServers=kafka:9092
+      - BootstrapServers=kafka:29092
     networks:
       - mynetwork
 
@@ -22,6 +22,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - mynetwork
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -36,6 +38,8 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - mynetwork
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest

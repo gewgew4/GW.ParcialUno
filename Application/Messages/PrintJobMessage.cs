@@ -1,4 +1,5 @@
 ﻿namespace Application.Messages;
+
 public class PrintJobMessage
 {
     public Guid JobId { get; set; }

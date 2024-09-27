@@ -1,9 +1,11 @@
 ﻿using Application.Exceptions;
 using Application.Messages;
 using Domain;
+using Domain.Enums;
 using Infrastructure.Kafka;
 using Infrastructure.Repo.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace Application.Commands;
@@ -12,35 +14,80 @@ public class CreatePrintJobCommandHandler : IRequestHandler<CreatePrintJobComman
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IKafkaProducer _kafkaProducer;
+    private readonly ILogger<CreatePrintJobCommandHandler> _logger;
 
-    public CreatePrintJobCommandHandler(IUnitOfWork unitOfWork, IKafkaProducer kafkaProducer)
+    public CreatePrintJobCommandHandler(IUnitOfWork unitOfWork, IKafkaProducer kafkaProducer, ILogger<CreatePrintJobCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _kafkaProducer = kafkaProducer;
+        _logger = logger;
     }
 
     public async Task<Guid> Handle(CreatePrintJobCommand request, CancellationToken cancellationToken)
     {
         var document = await _unitOfWork.DocumentRepo.GetById(request.DocumentId);
-        if (document == null)
-            throw new NotFoundException($"Document with ID {request.DocumentId} not found.");
+        CheckDocument(request, document);
 
-        var printJob = new PrintJob(request.DocumentId);
+        var printJob = new PrintJob(request.DocumentId, request.Priority);
 
         await _unitOfWork.PrintJobRepo.Add(printJob);
         await _unitOfWork.SaveAsync();
 
-        // Crear y enviar mensaje a Kafka
-        var kafkaMessage = new PrintJobMessage
+        var kafkaMessage = CreatePrintJobMessage(request, printJob);
+
+        var messageJson = JsonSerializer.Serialize(kafkaMessage);
+        try
+        {
+            await _kafkaProducer.ProduceAsync("print-jobs", messageJson);
+            printJob.Queue();
+            await _unitOfWork.PrintJobRepo.Update(printJob);
+        }
+        catch (Exception)
+        {
+            _logger.LogError("Error sending message to Kafka");
+            throw;
+        }
+
+        return printJob.Id;
+    }
+
+    /// <summary>
+    /// Validations on document
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="document"></param>
+    /// <exception cref="NotFoundException"></exception>
+    /// <exception cref="InvalidException"></exception>
+    private void CheckDocument(CreatePrintJobCommand request, Document document)
+    {
+        if (document == null)
+        {
+            var message = $"Document with ID {request.DocumentId} not found.";
+            _logger.LogError(message);
+            throw new NotFoundException(message);
+        }
+
+        if (document.Status == DocumentStatus.Printed)
+        {
+            var message = $"Document with ID {request.DocumentId} already printed.";
+            _logger.LogError(message);
+            throw new InvalidException(message);
+        }
+    }
+
+    /// <summary>
+    /// Create Kafka message
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="printJob"></param>
+    /// <returns></returns>
+    private static PrintJobMessage CreatePrintJobMessage(CreatePrintJobCommand request, PrintJob printJob)
+    {
+        return new PrintJobMessage
         {
             JobId = printJob.Id,
             DocumentId = printJob.DocumentId,
-            Priority = document.Priority
+            Priority = request.Priority
         };
-
-        string messageJson = JsonSerializer.Serialize(kafkaMessage);
-        await _kafkaProducer.ProduceAsync("print-jobs", messageJson);
-
-        return printJob.Id;
     }
 }

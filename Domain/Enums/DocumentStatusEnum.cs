@@ -3,7 +3,5 @@
 public enum DocumentStatus
 {
     Pending,
-    Printing,
-    Printed,
-    Failed
+    Printed
 }

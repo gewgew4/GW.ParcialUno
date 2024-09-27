@@ -16,7 +16,7 @@ public class CreateDocumentCommandHandler : IRequestHandler<CreateDocumentComman
 
     public async Task<Guid> Handle(CreateDocumentCommand request, CancellationToken cancellationToken)
     {
-        var document = new Document(request.Name, request.Content, request.Priority);
+        var document = new Document(request.Name, request.Content);
 
         await _unitOfWork.DocumentRepo.Add(document);
         await _unitOfWork.SaveAsync();
