@@ -25,7 +25,6 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddHttpContextAccessor();
 
-
         // Serilog
         var logger = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)

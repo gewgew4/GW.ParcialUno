@@ -40,4 +40,13 @@ public class DocumentController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet("{id}/printed")]
+    public async Task<ActionResult<Document>> GetDocumentPrinted(Guid id)
+    {
+        var query = new GetDocumentPrintJobQuery { Id = id, PrintJobStatus = PrintJobStatus.Completed };
+        var result = await _mediator.Send(query);
+
+        return Ok(result);
+    }
 }

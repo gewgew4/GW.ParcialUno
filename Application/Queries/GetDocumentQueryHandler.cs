@@ -5,18 +5,11 @@ using MediatR;
 
 namespace Application.Queries;
 
-public class GetDocumentQueryHandler : IRequestHandler<GetDocumentQuery, Document>
+public class GetDocumentQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetDocumentQuery, Document>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public GetDocumentQueryHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<Document> Handle(GetDocumentQuery request, CancellationToken cancellationToken)
     {
-        var document = await _unitOfWork.DocumentRepo.GetById(request.Id);
+        var document = await unitOfWork.DocumentRepo.GetById(request.Id);
         if (document == null)
         {
             throw new NotFoundException($"Document with ID {request.Id} not found.");

@@ -1,14 +1,14 @@
 ﻿using Confluent.Kafka;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Kafka;
-
 
 public class KafkaProducer : IKafkaProducer, IDisposable
 {
     private readonly IProducer<Null, string> _producer;
+    private readonly ILogger<KafkaProducer> _logger;
 
-    public KafkaProducer(IOptions<KafkaSettings> kafkaSettings)
+    public KafkaProducer(ILogger<KafkaProducer> logger)
     {
         var config = new ProducerConfig
         {
@@ -16,38 +16,27 @@ public class KafkaProducer : IKafkaProducer, IDisposable
         };
 
         _producer = new ProducerBuilder<Null, string>(config).Build();
+        _logger = logger;
     }
 
-    public async Task ProduceAsync(string topic, string message)
+    public async Task<bool> ProduceAsync(string topic, string message)
     {
         // TODO: sacar
         try
         {
             var result = await _producer.ProduceAsync(topic, new Message<Null, string> { Value = message });
-            //_logger.($"Delivered '{result.Value}' to '{result.TopicPartitionOffset}'");
-            if (true)
-            {
-
-            }
+            _logger.LogInformation($"Delivered '{result.Value}' to '{result.TopicPartitionOffset}'");
         }
         catch (ProduceException<Null, string> e)
         {
             Console.WriteLine($"Delivery failed: {e.Error.Reason}");
+            return false;
         }
-        catch (Exception ex)
-        {
-
-            throw;
-        }
+        return true;
     }
 
     public void Dispose()
     {
         _producer?.Dispose();
     }
-}
-
-public class KafkaSettings
-{
-    public string BootstrapServers { get; set; }
 }

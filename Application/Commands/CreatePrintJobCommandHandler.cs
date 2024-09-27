@@ -36,16 +36,16 @@ public class CreatePrintJobCommandHandler : IRequestHandler<CreatePrintJobComman
         var kafkaMessage = CreatePrintJobMessage(request, printJob);
 
         var messageJson = JsonSerializer.Serialize(kafkaMessage);
-        try
+        var messageSent = await _kafkaProducer.ProduceAsync("print-jobs", messageJson);
+        if (messageSent)
         {
-            await _kafkaProducer.ProduceAsync("print-jobs", messageJson);
             printJob.Queue();
             await _unitOfWork.PrintJobRepo.Update(printJob);
+            await _unitOfWork.SaveAsync();
         }
-        catch (Exception)
+        else
         {
-            _logger.LogError("Error sending message to Kafka");
-            throw;
+            throw new InvalidException("Error sending message to Kafka");
         }
 
         return printJob.Id;
