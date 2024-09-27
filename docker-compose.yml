@@ -12,8 +12,10 @@ services:
       - sqlserver
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=GWParcialUno;User Id=sa;Password=YourStrong@Passw0rd;
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=GWParcialUno;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
       - KafkaSettings__BootstrapServers=kafka:9092
+    networks:
+      - mynetwork
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -40,10 +42,17 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Express
     ports:
       - "1433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
+    networks:
+      - mynetwork
 
 volumes:
   sqlserver_data:
+  
+networks:
+  mynetwork:
+    driver: bridge

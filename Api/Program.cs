@@ -1,5 +1,6 @@
 using Application;
 using Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api;
 
@@ -26,6 +27,22 @@ public class Program
         builder.Services.ApplicationConfigureServices(builder.Configuration);
 
         var app = builder.Build();
+
+        // Automigrate database
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            try
+            {
+                var context = services.GetRequiredService<PContext>();
+                context.Database.Migrate();
+            }
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred while migrating the database.");
+            }
+        }
 
         // Configure the HTTP request pipeline.
         //if (app.Environment.IsDevelopment())
