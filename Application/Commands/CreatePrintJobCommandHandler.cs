@@ -1,5 +1,5 @@
 ﻿using Application.Exceptions;
-using Application.Messages;
+using Common.Messages;
 using Domain;
 using Domain.Enums;
 using Infrastructure.Kafka;
@@ -10,38 +10,29 @@ using System.Text.Json;
 
 namespace Application.Commands;
 
-public class CreatePrintJobCommandHandler : IRequestHandler<CreatePrintJobCommand, Guid>
+public class CreatePrintJobCommandHandler(IUnitOfWork unitOfWork,
+    IKafkaProducer kafkaProducer,
+    ILogger<CreatePrintJobCommandHandler> logger) : IRequestHandler<CreatePrintJobCommand, Guid>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IKafkaProducer _kafkaProducer;
-    private readonly ILogger<CreatePrintJobCommandHandler> _logger;
-
-    public CreatePrintJobCommandHandler(IUnitOfWork unitOfWork, IKafkaProducer kafkaProducer, ILogger<CreatePrintJobCommandHandler> logger)
-    {
-        _unitOfWork = unitOfWork;
-        _kafkaProducer = kafkaProducer;
-        _logger = logger;
-    }
-
     public async Task<Guid> Handle(CreatePrintJobCommand request, CancellationToken cancellationToken)
     {
-        var document = await _unitOfWork.DocumentRepo.GetById(request.DocumentId);
+        var document = await unitOfWork.DocumentRepo.GetById(request.DocumentId);
         CheckDocument(request, document);
 
         var printJob = new PrintJob(request.DocumentId, request.Priority);
 
-        await _unitOfWork.PrintJobRepo.Add(printJob);
-        await _unitOfWork.SaveAsync();
+        await unitOfWork.PrintJobRepo.Add(printJob);
+        await unitOfWork.SaveAsync();
 
-        var kafkaMessage = CreatePrintJobMessage(request, printJob);
+        var kafkaMessage = CreatePrintJobMessage(request, printJob, document.Content);
 
         var messageJson = JsonSerializer.Serialize(kafkaMessage);
-        var messageSent = await _kafkaProducer.ProduceAsync("print-jobs", messageJson);
+        var messageSent = await kafkaProducer.ProduceAsync("print-jobs", messageJson);
         if (messageSent)
         {
             printJob.Queue();
-            await _unitOfWork.PrintJobRepo.Update(printJob);
-            await _unitOfWork.SaveAsync();
+            await unitOfWork.PrintJobRepo.Update(printJob);
+            await unitOfWork.SaveAsync();
         }
         else
         {
@@ -63,14 +54,14 @@ public class CreatePrintJobCommandHandler : IRequestHandler<CreatePrintJobComman
         if (document == null)
         {
             var message = $"Document with ID {request.DocumentId} not found.";
-            _logger.LogError(message);
+            logger.LogError(message);
             throw new NotFoundException(message);
         }
 
         if (document.Status == DocumentStatus.Printed)
         {
             var message = $"Document with ID {request.DocumentId} already printed.";
-            _logger.LogError(message);
+            logger.LogError(message);
             throw new InvalidException(message);
         }
     }
@@ -81,12 +72,13 @@ public class CreatePrintJobCommandHandler : IRequestHandler<CreatePrintJobComman
     /// <param name="request"></param>
     /// <param name="printJob"></param>
     /// <returns></returns>
-    private static PrintJobMessage CreatePrintJobMessage(CreatePrintJobCommand request, PrintJob printJob)
+    private static PrintJobMessage CreatePrintJobMessage(CreatePrintJobCommand request, PrintJob printJob, byte[] content)
     {
         return new PrintJobMessage
         {
-            JobId = printJob.Id,
+            Content = content,
             DocumentId = printJob.DocumentId,
+            JobId = printJob.Id,
             Priority = request.Priority
         };
     }
