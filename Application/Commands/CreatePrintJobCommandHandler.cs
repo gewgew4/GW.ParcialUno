@@ -27,7 +27,7 @@ public class CreatePrintJobCommandHandler(IUnitOfWork unitOfWork,
         var kafkaMessage = CreatePrintJobMessage(request, printJob, document.Content);
 
         var messageJson = JsonSerializer.Serialize(kafkaMessage);
-        var messageSent = await kafkaProducer.ProduceAsync("print-jobs", messageJson);
+        var messageSent = await kafkaProducer.ProduceAsync("print-jobs", messageJson, request.Priority);
         if (messageSent)
         {
             printJob.Queue();

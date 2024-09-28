@@ -17,6 +17,18 @@ services:
     networks:
       - mynetwork
 
+  console-app:
+    build:
+      context: .
+      dockerfile: Receptor/Dockerfile
+    depends_on:
+      - kafka
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - KafkaSettings__BootstrapServers=kafka:29092
+    networks:
+      - mynetwork
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
