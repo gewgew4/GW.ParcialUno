@@ -8,12 +8,14 @@ public class UnitOfWork : IUnitOfWork
     private readonly PContext _context;
     public IDocumentRepo DocumentRepo { get; private set; }
     public IPrintJobRepo PrintJobRepo { get; private set; }
+    public IPrintResultRepo PrintResultRepo { get; private set; }
 
     public UnitOfWork(PContext context)
     {
         _context = context;
         DocumentRepo = new DocumentRepo(_context);
         PrintJobRepo = new PrintJobRepo(_context);
+        PrintResultRepo = new PrintResultRepo(_context);
     }
 
     public async Task<int> SaveAsync()

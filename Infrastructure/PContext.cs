@@ -9,6 +9,7 @@ public class PContext : DbContext
     public PContext(DbContextOptions<PContext> options) : base(options) { }
     public DbSet<Document> Documents { get; set; }
     public DbSet<PrintJob> PrintJobs { get; set; }
+    public DbSet<PrintResult> PrintResults { get; set; }
 
     public Task<int> SaveChangesAsync()
     {

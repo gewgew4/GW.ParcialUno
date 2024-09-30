@@ -18,6 +18,7 @@ public static class InfrastructureConfigurator
         // DI
         services.AddScoped<IDocumentRepo, DocumentRepo>();
         services.AddScoped<IPrintJobRepo, PrintJobRepo>();
+        services.AddScoped<IPrintResultRepo, PrintResultRepo>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         // Kafka
