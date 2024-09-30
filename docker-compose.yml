@@ -29,6 +29,21 @@ services:
     networks:
       - mynetwork
 
+  print-status-consumer:
+    build:
+      context: .
+      dockerfile: PrintStatusConsumer/Dockerfile
+    depends_on:
+      - kafka
+      - sqlserver
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=GWParcialUno;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
+      - KafkaSettings__BootstrapServers=kafka:29092
+      - KafkaSettings__TopicName=print-status
+    networks:
+      - mynetwork
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:

@@ -15,7 +15,9 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{6CB803F9-DD5F-4974-AD0C-F2D497F27316}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Receptor", "Receptor\Receptor.csproj", "{F2AD665A-F88F-4417-9BCE-0092EDBAC3FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Receptor", "Receptor\Receptor.csproj", "{F2AD665A-F88F-4417-9BCE-0092EDBAC3FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintStatusConsumer", "PrintStatusConsumer\PrintStatusConsumer.csproj", "{AA012C1E-BF8A-4EA4-A330-D3662F474955}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{F2AD665A-F88F-4417-9BCE-0092EDBAC3FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2AD665A-F88F-4417-9BCE-0092EDBAC3FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2AD665A-F88F-4417-9BCE-0092EDBAC3FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA012C1E-BF8A-4EA4-A330-D3662F474955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA012C1E-BF8A-4EA4-A330-D3662F474955}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA012C1E-BF8A-4EA4-A330-D3662F474955}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA012C1E-BF8A-4EA4-A330-D3662F474955}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
