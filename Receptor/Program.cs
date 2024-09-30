@@ -1,6 +1,8 @@
-﻿using Confluent.Kafka;
+﻿using Common.Messages;
+using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 using System.Text;
+using System.Text.Json;
 
 namespace Receptor;
 
@@ -40,6 +42,7 @@ internal class Program
         catch (OperationCanceledException)
         {
             // Normal exit
+            Console.WriteLine("Exit");
         }
         catch (Exception ex)
         {
@@ -112,7 +115,38 @@ internal class Program
     {
         Console.WriteLine($"Processing message with priority {priority}: {result.Message.Value}");
 
-        // TODO: process message
+        var printJobMessage = JsonSerializer.Deserialize<PrintJobMessage>(result.Message.Value);
+
+        // Queued
+        await DatabaseOperations.UpdatePrintJobStatus(printJobMessage.JobId, 1);
+
+        await Task.Delay(1000);
+        var rand = new Random();
+        if (rand.Next(0, 2) == 0)
+        {
+            // Failed
+            await DatabaseOperations.UpdatePrintJobStatus(printJobMessage.JobId, 4);
+        }
+        else
+        {
+            // Processing
+            await DatabaseOperations.UpdatePrintJobStatus(printJobMessage.JobId, 2);
+
+            // Simulated printing
+            var printed = DateTime.UtcNow;
+            Console.WriteLine(Convert.ToString(printJobMessage.Content));
+            await Task.Delay(5000);
+
+            // Send message to Kafka
+            var kafkaMessage = JsonSerializer.Serialize(new PrintStatusMessage
+            {
+                OK = "OK",
+                PrintDate = printed,
+                DocumentName = printJobMessage.DocumentName
+            });
+
+            await KafkaProducer.SendMessage(printJobMessage.JobId, "print-status", kafkaMessage);
+        }
 
         await Task.Delay(1000);
     }
