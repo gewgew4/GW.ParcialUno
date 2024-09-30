@@ -49,4 +49,22 @@ public class DocumentController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet("printed")]
+    public async Task<ActionResult<Document>> GetDocumentsPrinted([FromQuery] Guid[] ids)
+    {
+        var query = new GetDocumentsPrintJobQuery { Ids = ids, PrintJobStatus = PrintJobStatus.Completed };
+        var result = await _mediator.Send(query);
+
+        return Ok(result);
+    }
+
+    [HttpGet("notPrinted")]
+    public async Task<ActionResult<Document>> GetDocumentsNotPrinted([FromQuery] Guid[] ids)
+    {
+        var query = new GetDocumentsPrintJobQuery { Ids = ids, PrintJobStatus = PrintJobStatus.Failed };
+        var result = await _mediator.Send(query);
+
+        return Ok(result);
+    }
 }

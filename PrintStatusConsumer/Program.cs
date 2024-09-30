@@ -97,6 +97,13 @@ internal class Program
                 transaction
             );
 
+            // Update PrintJobs table
+            await connection.ExecuteAsync(
+                "UPDATE PrintJobs SET Status = 3 WHERE Id = @JobId",
+                new { JobId = jobId },
+                transaction
+            );
+
             // Get CreatedAt from PrintJobs table
             var createdAt = await connection.ExecuteScalarAsync<DateTime>(
                 "SELECT CreatedAt FROM PrintJobs WHERE Id = @JobId",
