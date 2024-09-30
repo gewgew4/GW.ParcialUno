@@ -13,20 +13,24 @@ internal class Program
     private static readonly int BatchSize = 10;
     private static readonly TimeSpan ProcessInterval = TimeSpan.FromSeconds(5);
     private static DateTime _lastProcessTime = DateTime.MinValue;
+    private static string _topicNameJobs;
+    private static string _topicNameStatus;
 
     public static async Task Main(string[] args)
     {
         var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables()
             .Build();
 
         var consumerConfig = new ConsumerConfig
         {
             BootstrapServers = configuration["KafkaSettings:BootstrapServers"],
-            GroupId = "print-job-consumer-group",
-            AutoOffsetReset = AutoOffsetReset.Earliest
+            GroupId = configuration["KafkaSettings:ConsumerName"],
+            AutoOffsetReset = AutoOffsetReset.Earliest,
         };
+
+        _topicNameJobs = configuration["KafkaSettings:TopicNameJobs"] ?? throw new InvalidOperationException("Jobs topic name not found in configuration.");
+        _topicNameStatus = configuration["KafkaSettings:TopicNameStatus"] ?? throw new InvalidOperationException("Status topic name not found in configuration.");
 
         using var cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) =>
@@ -53,7 +57,7 @@ internal class Program
     static async Task RunConsumer(ConsumerConfig config, CancellationToken cancellationToken)
     {
         using var consumer = new ConsumerBuilder<Ignore, string>(config).Build();
-        consumer.Subscribe("print-jobs");
+        consumer.Subscribe(_topicNameJobs);
 
         try
         {
@@ -76,7 +80,7 @@ internal class Program
                 }
                 catch (ConsumeException ex)
                 {
-                    Console.WriteLine($"Error consuming message: {ex.Message}");
+                    Console.WriteLine($"Error: {ex.Message}");
                 }
             }
         }
@@ -145,7 +149,7 @@ internal class Program
                 DocumentName = printJobMessage.DocumentName
             });
 
-            await KafkaProducer.SendMessage(printJobMessage.JobId, "print-status", kafkaMessage);
+            await KafkaProducer.SendMessage(printJobMessage.JobId, _topicNameStatus, kafkaMessage);
         }
 
         await Task.Delay(1000);

@@ -12,7 +12,6 @@ public static class KafkaProducer
         try
         {
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -24,7 +23,7 @@ public static class KafkaProducer
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            Console.WriteLine($"Error: {ex.Message}");
             throw;
         }
     }

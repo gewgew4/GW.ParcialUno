@@ -26,6 +26,10 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - KafkaSettings__BootstrapServers=kafka:29092
+      - KafkaSettings__ConsumerName=print-job-consumer-group
+      - KafkaSettings__TopicNameJobs=print-jobs
+      - KafkaSettings__TopicNameStatus=print-status
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=GWParcialUno;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
     networks:
       - mynetwork
 
@@ -41,6 +45,7 @@ services:
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=GWParcialUno;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
       - KafkaSettings__BootstrapServers=kafka:29092
       - KafkaSettings__TopicName=print-status
+      - KafkaSettings__ConsumerName=print-status-consumer-group
     networks:
       - mynetwork
 
