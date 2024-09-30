@@ -1,15 +1,9 @@
 ﻿namespace Domain;
 
-public class PrintResult
+public class PrintResult : BaseEntity<PrintResult>
 {
-    public Guid DocumentId { get; private set; }
-    public DateTime PrintedAt { get; private set; }
-    public DateTime RecordedAt { get; private set; }
-
-    public PrintResult(Guid documentId, DateTime printedAt)
-    {
-        DocumentId = documentId;
-        PrintedAt = printedAt;
-        RecordedAt = DateTime.UtcNow;
-    }
+    public Guid DocumentId { get; set; }
+    public string DocumentName { get; set; }
+    public DateTime PrintedAt { get; set; }
+    public DateTime RecordedAt { get; set; } = DateTime.UtcNow;
 }

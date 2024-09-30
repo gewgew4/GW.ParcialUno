@@ -24,7 +24,7 @@ public class CreatePrintJobCommandHandler(IUnitOfWork unitOfWork,
         await unitOfWork.PrintJobRepo.Add(printJob);
         await unitOfWork.SaveAsync();
 
-        var kafkaMessage = CreatePrintJobMessage(request, printJob, document.Content);
+        var kafkaMessage = CreatePrintJobMessage(request, printJob, document);
 
         var messageJson = JsonSerializer.Serialize(kafkaMessage);
         var messageSent = await kafkaProducer.ProduceAsync("print-jobs", messageJson, request.Priority);
@@ -72,12 +72,14 @@ public class CreatePrintJobCommandHandler(IUnitOfWork unitOfWork,
     /// <param name="request"></param>
     /// <param name="printJob"></param>
     /// <returns></returns>
-    private static PrintJobMessage CreatePrintJobMessage(CreatePrintJobCommand request, PrintJob printJob, byte[] content)
+    private static PrintJobMessage CreatePrintJobMessage(CreatePrintJobCommand request, PrintJob printJob, Document document )
     {
         return new PrintJobMessage
         {
-            Content = content,
+            Content = document.Content,
+            CreatedAt = printJob.CreatedAt,
             DocumentId = printJob.DocumentId,
+            DocumentName = document.Name,
             JobId = printJob.Id,
             Priority = request.Priority
         };
