@@ -2,6 +2,7 @@
 using Application.Models;
 using Application.Queries;
 using Domain;
+using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

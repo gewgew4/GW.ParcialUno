@@ -1,4 +1,5 @@
-﻿namespace Domain;
+﻿namespace Domain.Enums;
+
 public enum PrintJobStatus
 {
     None,

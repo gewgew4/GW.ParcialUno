@@ -1,5 +1,5 @@
 ﻿using Application.Models;
-using Domain;
+using Domain.Enums;
 using MediatR;
 
 namespace Application.Queries;
