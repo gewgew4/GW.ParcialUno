@@ -36,6 +36,7 @@ internal class Program
         using var consumer = new ConsumerBuilder<string, string>(config).Build();
         consumer.Subscribe(_topicName);
 
+        // Cancellation token to gracefully stop the consumer
         var cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) =>
         {
@@ -99,8 +100,8 @@ internal class Program
 
             // Update PrintJobs table
             await connection.ExecuteAsync(
-                "UPDATE PrintJobs SET Status = 3 WHERE Id = @JobId",
-                new { JobId = jobId },
+                "UPDATE PrintJobs SET CompletedAt = @CompletedAt, Status = 3 WHERE Id = @JobId",
+                new { CompletedAt = printStatus.PrintDate, JobId = jobId },
                 transaction
             );
 
