@@ -11,7 +11,7 @@ internal class Program
     private static PriorityQueue<ConsumeResult<Ignore, string>, int> _priorityQueue = new();
     // Process with BatchSize messages or every ProcessInterval
     private static readonly int BatchSize = 10;
-    private static readonly TimeSpan ProcessInterval = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan ProcessInterval = TimeSpan.FromSeconds(20);
     private static DateTime _lastProcessTime = DateTime.MinValue;
     private static string _topicNameJobs;
     private static string _topicNameStatus;
@@ -41,6 +41,7 @@ internal class Program
 
         try
         {
+            Console.WriteLine("Started consumption");
             await RunConsumer(consumerConfig, cts.Token);
         }
         catch (OperationCanceledException)
@@ -124,16 +125,18 @@ internal class Program
         // Queued
         await DatabaseOperations.UpdatePrintJobStatus(printJobMessage.JobId, 1);
 
-        await Task.Delay(1000);
+        await Task.Delay(1500);
         var rand = new Random();
         if (rand.Next(0, 2) == 0)
         {
             // Failed
+            Console.WriteLine("Simulated fail");
             await DatabaseOperations.UpdatePrintJobStatus(printJobMessage.JobId, 4);
         }
         else
         {
             // Processing
+            Console.WriteLine("Simulated ok");
             await DatabaseOperations.UpdatePrintJobStatus(printJobMessage.JobId, 2);
 
             // Simulated printing
@@ -152,6 +155,6 @@ internal class Program
             await KafkaProducer.SendMessage(printJobMessage.JobId, _topicNameStatus, kafkaMessage);
         }
 
-        await Task.Delay(1000);
+        await Task.Delay(1500);
     }
 }

@@ -10,15 +10,8 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class DocumentController : ControllerBase
+public class DocumentController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public DocumentController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpPost]
     public async Task<ActionResult<Guid>> CreateDocument([FromBody] CreateDocumentRequest dto)
     {
@@ -28,7 +21,7 @@ public class DocumentController : ControllerBase
             Content = Convert.FromBase64String(dto.Content)
         };
 
-        var result = await _mediator.Send(command);
+        var result = await mediator.Send(command);
 
         return Ok(result);
     }
@@ -37,7 +30,7 @@ public class DocumentController : ControllerBase
     public async Task<ActionResult<Document>> GetDocument(Guid id)
     {
         var query = new GetDocumentQuery { Id = id };
-        var result = await _mediator.Send(query);
+        var result = await mediator.Send(query);
 
         return Ok(result);
     }
@@ -46,7 +39,7 @@ public class DocumentController : ControllerBase
     public async Task<ActionResult<Document>> GetDocumentPrinted(Guid id)
     {
         var query = new GetDocumentPrintJobQuery { Id = id, PrintJobStatus = PrintJobStatus.Completed };
-        var result = await _mediator.Send(query);
+        var result = await mediator.Send(query);
 
         return Ok(result);
     }
@@ -55,7 +48,7 @@ public class DocumentController : ControllerBase
     public async Task<ActionResult<Document>> GetDocumentsPrinted([FromQuery] Guid[] ids, PrintJobStatus status)
     {
         var query = new GetDocumentsPrintJobQuery { Ids = ids, PrintJobStatus = status };
-        var result = await _mediator.Send(query);
+        var result = await mediator.Send(query);
 
         return Ok(result);
     }

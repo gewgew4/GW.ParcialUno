@@ -15,7 +15,7 @@ public class GetDocumentsPrintJobQueryHandler(IUnitOfWork unitOfWork) : IRequest
 
             var printJobs = await unitOfWork.PrintJobRepo
                 .GetWhere(p => p.DocumentId == item && p.Status == request.PrintJobStatus);
-            
+
             if (document is not null && printJobs.Any())
             {
                 var resultSingle = new GetDocumentPrintJobResponse

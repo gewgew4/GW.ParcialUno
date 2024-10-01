@@ -23,8 +23,8 @@ public class ExceptionHandlerMiddleware(RequestDelegate next, bool showRawError,
         response.ContentType = "application/json";
 
         logger.LogError(error, error.Message);
-        string _error = showRawError ? error.Message : "";
-        string _message = "Internal Server Error";
+        var _error = showRawError ? error.Message : "";
+        var _message = "Internal Server Error";
 
         response.StatusCode = (int)HttpStatusCode.InternalServerError;
 

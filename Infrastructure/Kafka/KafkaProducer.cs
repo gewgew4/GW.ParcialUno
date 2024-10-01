@@ -13,7 +13,7 @@ public class KafkaProducer : IKafkaProducer, IDisposable
     {
         var config = new ProducerConfig
         {
-            BootstrapServers = Environment.GetEnvironmentVariable("BootstrapServers") //kafkaSettings.Value.BootstrapServers
+            BootstrapServers = Environment.GetEnvironmentVariable("BootstrapServers")
         };
 
         _producer = new ProducerBuilder<Null, string>(config).Build();
@@ -22,7 +22,6 @@ public class KafkaProducer : IKafkaProducer, IDisposable
 
     public async Task<bool> ProduceAsync(string topic, string message, byte priority)
     {
-        // TODO: sacar
         try
         {
             var headers = new Headers
@@ -35,13 +34,11 @@ public class KafkaProducer : IKafkaProducer, IDisposable
         catch (ProduceException<Null, string> e)
         {
             Console.WriteLine($"Delivery failed: {e.Error.Reason}");
+
             return false;
         }
         return true;
     }
 
-    public void Dispose()
-    {
-        _producer?.Dispose();
-    }
+    public void Dispose() => _producer?.Dispose();
 }

@@ -4,9 +4,8 @@ using System.Text.Json;
 
 namespace Infrastructure;
 
-public class PContext : DbContext
+public class PContext(DbContextOptions<PContext> options) : DbContext(options)
 {
-    public PContext(DbContextOptions<PContext> options) : base(options) { }
     public DbSet<Document> Documents { get; set; }
     public DbSet<PrintJob> PrintJobs { get; set; }
     public DbSet<PrintResult> PrintResults { get; set; }

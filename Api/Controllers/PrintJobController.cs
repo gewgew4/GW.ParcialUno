@@ -9,15 +9,8 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PrintJobController : ControllerBase
+public class PrintJobController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public PrintJobController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpPost]
     public async Task<ActionResult<Guid>> CreatePrintJob([FromBody] CreatePrintJobRequest dto)
     {
@@ -27,7 +20,7 @@ public class PrintJobController : ControllerBase
             Priority = dto.Priority
         };
 
-        var result = await _mediator.Send(command);
+        var result = await mediator.Send(command);
 
         return Ok(result);
     }
@@ -36,9 +29,23 @@ public class PrintJobController : ControllerBase
     public async Task<ActionResult<PrintJob>> GetPrintJob(Guid id)
     {
         var query = new GetPrintJobQuery { Id = id };
-        var result = await _mediator.Send(query);
+        var result = await mediator.Send(query);
 
         if (result == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<List<PrintJob>>> GetPrintJobs()
+    {
+        var query = new GetPrintJobsQuery();
+        var result = await mediator.Send(query);
+
+        if (result == null || result.Count == 0)
         {
             return NotFound();
         }

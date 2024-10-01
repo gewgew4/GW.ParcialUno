@@ -5,16 +5,10 @@ using System.Linq.Expressions;
 
 namespace Infrastructure.Repo;
 
-public class GenericRepo<T> : IGenericRepo<T> where T : BaseEntity<T>
+public class GenericRepo<T>(PContext context) : IGenericRepo<T> where T : BaseEntity<T>
 {
-    protected readonly PContext _context;
-    protected readonly DbSet<T> _dbSet;
-
-    public GenericRepo(PContext context)
-    {
-        _context = context;
-        _dbSet = context.Set<T>();
-    }
+    protected readonly PContext _context = context;
+    protected readonly DbSet<T> _dbSet = context.Set<T>();
 
     public async Task<T> GetById(Guid id, bool tracking = true, params string[] includeProperties)
     {

@@ -21,4 +21,3 @@ public class Document : BaseEntity<Document>
         Status = newStatus;
     }
 }
-
